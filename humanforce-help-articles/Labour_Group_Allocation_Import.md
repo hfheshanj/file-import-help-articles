@@ -2,22 +2,29 @@
 
 Follow this guide to upload labour group allocation records in bulk to Humanforce WFM using the Integration Central file import tool. This allows you to create, update, and delete labour groups, assign shift types to labour groups, and configure location/department/role allocations.
 
+This task is designed for organisations managing labour group configurations, shift type assignments, and workforce allocation percentages across multiple locations, departments, and roles in WFM.
+
 If you're not familiar with the Integration Central file import feature, read **Configure and run file import tasks in Integration Central** before continuing.
+
+For new users: All uploads are validated for formatting and field matching. The system supports three types of row configurations: group-only rows (for deleting labour groups), group + shift type rows (for assigning shift types), and full allocation rows (for configuring allocation percentages). All rows for the same labour group must use identical Shift Type values or the import will be rejected.
 
 ## Part 1: Prepare the labour group allocation import file
 
 1. Go to Management > Advanced > Integration Central > Add New > File Import.
 2. Set the Data type to **Labour Group Allocation Import**.
 3. Click **Download template** to get the latest version.
-4. Review the field requirements in the reference section below to ensure your data is valid and complete.
-5. Enter labour group allocation data into the file using the required headers.
-6. Save the file locally in .CSV format.
+4. Open the newly downloaded template.
+5. Review the field requirements in the reference section below to ensure your data is valid and complete.
+6. Enter labour group allocation data into the file using the required headers.
+7. Save the file locally in .CSV format.
+
+When your file is correctly structured and saved, it's ready to upload in Integration Central.
 
 ## Part 2: Upload and configure the labour group allocation import
 
 1. Go to Management > Advanced > Integration Central > Add New > File Import.
 2. Set the Data type to **Labour Group Allocation Import**.
-3. Upload your file using either ad-hoc upload or scheduled SFTP upload.
+3. In the File section:
    - For an ad-hoc upload, drag and drop your file into the upload box, or click **Browse** to select the file from your computer.
    - For a scheduled upload, click **Humanforce SFTP import**.
    - Note: You must have SFTP configured. To learn how, see **How to setup the Humanforce SFTP folder**.
@@ -27,8 +34,27 @@ If you're not familiar with the Integration Central file import feature, read **
    - The matching strategy you select determines which labour group identifier field must be populated in your CSV file. All rows for the same labour group must use the same identifier value.
    - For example: If you select Name matching, only the Labour Group Name field is required. Export Code and GuidKey fields are optional.
 
-5. Configure lookup types for entity fields (Location, Department, Role, Shift Type) in the field mapping screen.
-6. Review and confirm your import configuration.
+5. (Optional) In Task completion notification, enter an email address to be notified when the import finishes.
+6. Click **Next**.
+7. Review the field mapping screen and update if required:
+   - Field mapping rules (checkboxes at the top)
+   - Source fields > target fields mapping
+   - Lookup types for entity fields (Location, Department, Role, Shift Type)
+   - Default values
+8. Click **Next**.
+9. Choose one of the following:
+   - **Save mapping & import** – if you plan to reuse this setup in future.
+   - **Import only** – if this is a one-time upload.
+
+Once complete, you'll see a confirmation summary including:
+- Number of rows successfully imported
+- Any failed rows with error details
+
+For saved mappings:
+- Click **Got it** to return to Integration Central > File Import.
+- Click the three dot menu next to your file and choose **View logs** or **History** to check results.
+
+When successful, the uploaded labour groups and allocations will appear in the labour group configuration screens in WFM.
 
 ## Reference: Labour Group Allocation Import file field definitions
 
@@ -70,18 +96,25 @@ Within the same labour group, you cannot have multiple allocations that resolve 
 
 **If any labour group in your import contains duplicate allocations, the ENTIRE import batch will be rejected and no rows will be processed.** Ensure each allocation is unique within each labour group.
 
-### Error handling behavior
+### File size and batching
+
+File must be under 15 MB. If your file exceeds this, split it into multiple smaller files. The system automatically handles batching during import (maximum 200 records per batch, grouped by labour group identifier).
+
+### Validation and errors
 
 **Batch-level validation errors** (entire batch rejected, no rows processed):
 - Duplicate labour group identifiers within the import
 - Missing labour group identifier fields required by the selected matching strategy
 - Duplicate allocations within any labour group
+- Inconsistent Shift Type values for the same labour group
+- Export Code not unique (two or more labour groups have the same Export Code value)
 
 **Row-level validation errors** (only affected rows rejected, valid rows processed):
-- Invalid allocation values
+- Invalid allocation values (not between 0 and 100, or more than 2 decimal places)
 - Entity identifiers not found (Location, Department, Role, Shift Type)
-- Invalid Location/Department/Role combinations
-- Partial allocation fields provided
+- Invalid Location/Department/Role combinations (not valid DepartmentRole relationships in WFM)
+- Partial allocation fields provided (some but not all of Location, Department, Role, or Allocation Value)
+- New labour group without shift types (at least one shift type required unless being deleted)
 
 ### Matching and resolution
 
@@ -91,25 +124,6 @@ Within the same labour group, you cannot have multiple allocations that resolve 
 - All identifier matching is case-sensitive and whitespace-sensitive.
 - Location + Department + Role combinations must exist as valid DepartmentRole relationships in WFM. Invalid combinations will be rejected.
 - **Leave types are automatically filtered out during import** and cannot be assigned to labour groups, even if included in the Shift Type field.
-
-### File size and batching
-
-File must be under 15 MB. If your file exceeds this, split it into multiple smaller files. The system automatically handles batching during import (maximum 200 records per batch, grouped by labour group identifier).
-
-### Validation errors
-
-Common validation errors:
-
-- **Labour group identifier missing**: The identifier field required by the selected matching strategy (Name, Export Code, or GuidKey) is blank. [Batch-level error]
-- **Duplicate labour group identifiers**: Two or more rows in the import use different identifier values for what should be the same labour group. [Batch-level error]
-- **Inconsistent Shift Type values**: Different rows for the same labour group have different Shift Type values. [Batch-level error]
-- **Duplicate allocation within labour group**: Same Location + Department + Role combination (after entity resolution) appears multiple times for the same labour group. [Batch-level error]
-- **Partial allocation fields**: Some but not all of Location, Department, Role, or Allocation Value are provided. [Row-level error]
-- **Invalid Allocation Value**: Value is not a number between 0 and 100, or has more than 2 decimal places. [Row-level error]
-- **Location/Department/Role not found**: Entity identifier doesn't match any record in WFM. [Row-level error]
-- **Invalid Location/Department/Role combination**: The combination doesn't exist as a valid DepartmentRole relationship in WFM. [Row-level error]
-- **Export Code not unique**: Two or more labour groups have the same Export Code value (validated during import). [Batch-level error]
-- **New labour group without shift types**: Creating a new labour group requires at least one shift type unless the group is being deleted. [Row-level error]
 
 ## Tips
 
@@ -123,3 +137,4 @@ Common validation errors:
 - All rows for the same labour group must use the same labour group identifier value and the same Shift Type value (or all leave it blank).
 - **Critical**: Ensure no duplicate Location+Department+Role combinations exist within each labour group, as this will reject the entire batch.
 - To avoid duplication, do not upload the same file more than once.
+- If you need to automate uploads, speak to your administrator about scheduled import options.
