@@ -9,117 +9,101 @@ If you're not familiar with the Integration Central file import feature, read **
 1. Go to Management > Advanced > Integration Central > Add New > File Import.
 2. Set the Data type to **Labour Group Allocation Import**.
 3. Click **Download template** to get the latest version.
-4. Review the field requirements in the reference section below to ensure your data is valid and complete.
-5. Enter labour group allocation data into the file using the required headers.
-6. Save the file locally in .CSV format.
+4. Open the newly downloaded template.
+5. Review the field requirements in the reference section below to ensure your data is valid and complete.
+6. Enter labour group allocation data into the file using the required headers.
+7. Save the file locally in .CSV format.
 
 ## Part 2: Upload and configure the labour group allocation import
 
 1. Go to Management > Advanced > Integration Central > Add New > File Import.
 2. Set the Data type to **Labour Group Allocation Import**.
-3. Upload your file using either ad-hoc upload or scheduled SFTP upload.
+3. In the File section:
    - For an ad-hoc upload, drag and drop your file into the upload box, or click **Browse** to select the file from your computer.
    - For a scheduled upload, click **Humanforce SFTP import**.
    - Note: You must have SFTP configured. To learn how, see **How to setup the Humanforce SFTP folder**.
 
 4. Configure import options:
    - Choose a labour group matching identifier (Labour Group Name, Labour Group Export Code, or Labour Group GuidKey). This step is mandatory.
-   - The matching strategy you select determines which labour group identifier field must be populated in your CSV file. All rows for the same labour group must use the same identifier value.
-   - For example: If you select Name matching, only the Labour Group Name field is required. Export Code and GuidKey fields are optional.
+   - The matching strategy you select determines which labour group identifier field must be populated in your CSV file.
 
-5. Configure lookup types for entity fields (Location, Department, Role, Shift Type) in the field mapping screen.
-6. Review and confirm your import configuration.
+5. (Optional) In Task completion notification, enter an email address to be notified when the import finishes.
+6. Click **Next**.
+7. Review the field mapping screen and configure lookup types for entity fields (Location, Department, Role, Shift Type).
+8. Click **Next**.
+9. Choose **Save mapping & import** or **Import only**.
+
+Once complete, you'll see a confirmation summary including number of rows successfully imported and any failed rows with error details.
 
 ## Reference: Labour Group Allocation Import file field definitions
 
 | Field Name | Description | Format / Rules |
 |------------|-------------|----------------|
-| **Labour Group Name** | Name of the labour group. Used to match existing labour groups when matching strategy is Name. | Optional (required only with Name matching strategy). Max 100 characters. Min 1 character. Matching is case-sensitive and whitespace-sensitive (e.g. 'Group A ' will not match 'Group A'). |
-| **Labour Group Export Code** | Export code of the labour group. Used to match existing labour groups when matching strategy is Export Code. | Optional (required only with Export Code matching strategy). Max 50 characters. Matching is case-sensitive and whitespace-sensitive. Export Code uniqueness is validated during import (not enforced at database level). |
-| **Labour Group GuidKey** | GuidKey of the labour group. Used to match existing labour groups when matching strategy is GuidKey. | Optional (required only with GuidKey matching strategy). Max 36 characters. Must be a valid GUID format (e.g. 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'). |
-| **Labour Group Deleted** | Set to Y or TRUE to delete the matching labour group record. | Optional. Boolean field. TRUE values: Y, T, 1, True, TRUE, yes, YES. FALSE values: N, F, 0, False, FALSE, no, NO. Case-insensitive. When set to Y, the matching labour group is marked as deleted. Deletion only sets the Deleted flag and does not cascade to child scope or allocation records. |
-| **Shift Type** | Shift types to assign to the labour group. Multiple shift types can be separated by semicolon (;). | Optional. Supported lookups: Name, ShortName, ExportCode, GuidKey. Leave types are automatically filtered out and cannot be assigned to labour groups. If omitted or empty for an existing labour group, existing shift types remain unchanged. All rows for the same labour group must have identical Shift Type values or the import will fail. For new labour groups, at least one shift type is required unless the group is being deleted. |
-| **Location** | Location for the labour group allocation. | Optional (required only for allocation rows). **Important**: Location names are matched against the LocationName field in WFM, not the Name field. Supported lookups: Name (LocationName), ExportCode, GuidKey. Matching is case-sensitive and whitespace-sensitive. If provided, Department, Role, and Allocation Value must also be provided. |
+| **Labour Group Name** | Name of the labour group. Used to match existing labour groups when matching strategy is Name. | Optional (required only with Name matching strategy). Max 100 characters. Min 1 character. Matching is case-sensitive and whitespace-sensitive. |
+| **Labour Group Export Code** | Export code of the labour group. Used to match existing labour groups when matching strategy is Export Code. | Optional (required only with Export Code matching strategy). Max 50 characters. Matching is case-sensitive and whitespace-sensitive. |
+| **Labour Group GuidKey** | GuidKey of the labour group. Used to match existing labour groups when matching strategy is GuidKey. | Optional (required only with GuidKey matching strategy). Max 36 characters. Must be a valid GUID format. |
+| **Labour Group Deleted** | Set to Y or TRUE to delete the matching labour group record. | Optional. Boolean field. TRUE values: Y, T, 1, True, TRUE, yes, YES. FALSE values: N, F, 0, False, FALSE, no, NO. Case-insensitive. Deletion only sets the Deleted flag and does not cascade to child records. |
+| **Shift Type** | Shift types to assign to the labour group. Multiple shift types can be separated by semicolon (;). | Optional. Supported lookups: Name, ShortName, ExportCode, GuidKey. Leave types are automatically filtered out. All rows for the same labour group must have identical Shift Type values. For new labour groups, at least one shift type is required unless the group is being deleted. |
+| **Location** | Location for the labour group allocation. | Optional (required only for allocation rows). Location names are matched against the LocationName field in WFM. Supported lookups: Name (LocationName), ExportCode, GuidKey. Matching is case-sensitive and whitespace-sensitive. If provided, Department, Role, and Allocation Value must also be provided. |
 | **Department** | Department for the labour group allocation. | Optional (required only for allocation rows). Supported lookups: Name, ExportCode, GuidKey. Matching is case-sensitive and whitespace-sensitive. If provided, Location, Role, and Allocation Value must also be provided. |
 | **Role** | Role for the labour group allocation. | Optional (required only for allocation rows). Supported lookups: Name, ExportCode, GuidKey. Matching is case-sensitive and whitespace-sensitive. If provided, Location, Department, and Allocation Value must also be provided. |
-| **Allocation Value** | Percentage value for the labour group allocation. | Optional (required only for allocation rows). Must be a decimal number between 0 and 100 (inclusive). Maximum 2 decimal places (e.g. 50, 33.33, 100.00). If provided, Location, Department, and Role must also be provided. |
-| **Allocation Deleted** | Set to Y or TRUE to mark this specific allocation as deleted. | Optional. Boolean field. TRUE values: Y, T, 1, True, TRUE, yes, YES. FALSE values: N, F, 0, False, FALSE, no, NO. Case-insensitive. When set to Y, the matching allocation (by Location + Department + Role) is marked as deleted. The labour group and its shift types remain unchanged. |
+| **Allocation Value** | Percentage value for the labour group allocation. | Optional (required only for allocation rows). Must be a decimal number between 0 and 100 (inclusive). Maximum 2 decimal places. If provided, Location, Department, and Role must also be provided. |
+| **Allocation Deleted** | Set to Y or TRUE to mark this specific allocation as deleted. | Optional. Boolean field. TRUE values: Y, T, 1, True, TRUE, yes, YES. FALSE values: N, F, 0, False, FALSE, no, NO. Case-insensitive. The labour group and its shift types remain unchanged. |
 
 ## Additional information
 
-### Row types and combinations
+### Row types
 
-The import supports three distinct row types:
+The import supports three row types:
 
-1. **Group-only rows** – Rows that specify a labour group identifier and optionally set Labour Group Deleted = Y. No shift types or allocations. Used to delete labour groups.
-2. **Group + Shift Type rows** – Rows that specify a labour group identifier and Shift Type values. No allocation fields. Used to create or update labour groups and assign shift types.
-3. **Full allocation rows** – Rows that specify a labour group identifier, optionally Shift Type values, and all four allocation fields (Location, Department, Role, Allocation Value). Used to create or update labour groups with allocations.
+1. **Group-only rows** – Specify a labour group identifier and optionally set Labour Group Deleted = Y. No shift types or allocations.
+2. **Group + Shift Type rows** – Specify a labour group identifier and Shift Type values. No allocation fields.
+3. **Full allocation rows** – Specify a labour group identifier, optionally Shift Type values, and all four allocation fields (Location, Department, Role, Allocation Value).
 
-**Important**: All allocation fields (Location, Department, Role, Allocation Value) must be provided together. Providing only some of these fields will cause validation errors.
+All allocation fields (Location, Department, Role, Allocation Value) must be provided together.
 
-### Update behavior and duplicate detection
+### Update behavior
 
 - **Creating new labour groups**: If no labour group matches the identifier, a new labour group is created. For new labour groups, at least one shift type is required unless the group is being deleted.
 - **Updating existing labour groups**: If a labour group matches the identifier, the system updates shift types (if provided) and merges allocations.
 - **Shift type sync**: The system replaces all shift types for a labour group with the shift types specified in the import file. If multiple rows for the same labour group have different Shift Type values, the entire import batch will be rejected. To keep existing shift types unchanged, leave the Shift Type field empty on all rows for that group.
 - **Allocation merge**: The system merges allocations based on the Location + Department + Role combination. Existing allocations with the same combination are updated; new combinations are added.
 
-#### ⚠️ Critical: Duplicate Detection Behavior
+### Duplicate detection
 
-Within the same labour group, you cannot have multiple allocations that resolve to the same Location + Department + Role combination (even if specified using different identifier types like Name vs ExportCode). The system validates this after resolving entity identifiers.
+Within the same labour group, you cannot have multiple allocations that resolve to the same Location + Department + Role combination. If any labour group in your import contains duplicate allocations, the entire import batch will be rejected and no rows will be processed.
 
-**If any labour group in your import contains duplicate allocations, the ENTIRE import batch will be rejected and no rows will be processed.** Ensure each allocation is unique within each labour group.
-
-### Error handling behavior
+### Validation errors
 
 **Batch-level validation errors** (entire batch rejected, no rows processed):
 - Duplicate labour group identifiers within the import
 - Missing labour group identifier fields required by the selected matching strategy
 - Duplicate allocations within any labour group
+- Inconsistent Shift Type values for the same labour group
+- Export Code not unique
 
 **Row-level validation errors** (only affected rows rejected, valid rows processed):
 - Invalid allocation values
 - Entity identifiers not found (Location, Department, Role, Shift Type)
 - Invalid Location/Department/Role combinations
 - Partial allocation fields provided
+- New labour group without shift types
 
-### Matching and resolution
+### Matching rules
 
-- The matching strategy selected during upload determines which labour group identifier field is used to find existing labour groups.
 - Entity identifiers (Location, Department, Role, Shift Type) are resolved using the lookup type configured in the field mapping screen (Name, ExportCode, or GuidKey).
-- **Location identifiers are matched against the LocationName field in WFM, not the Name field.**
+- Location identifiers are matched against the LocationName field in WFM, not the Name field.
 - All identifier matching is case-sensitive and whitespace-sensitive.
-- Location + Department + Role combinations must exist as valid DepartmentRole relationships in WFM. Invalid combinations will be rejected.
-- **Leave types are automatically filtered out during import** and cannot be assigned to labour groups, even if included in the Shift Type field.
+- Location + Department + Role combinations must exist as valid DepartmentRole relationships in WFM.
+- Leave types are automatically filtered out during import and cannot be assigned to labour groups.
 
-### File size and batching
+### File size
 
-File must be under 15 MB. If your file exceeds this, split it into multiple smaller files. The system automatically handles batching during import (maximum 200 records per batch, grouped by labour group identifier).
-
-### Validation errors
-
-Common validation errors:
-
-- **Labour group identifier missing**: The identifier field required by the selected matching strategy (Name, Export Code, or GuidKey) is blank. [Batch-level error]
-- **Duplicate labour group identifiers**: Two or more rows in the import use different identifier values for what should be the same labour group. [Batch-level error]
-- **Inconsistent Shift Type values**: Different rows for the same labour group have different Shift Type values. [Batch-level error]
-- **Duplicate allocation within labour group**: Same Location + Department + Role combination (after entity resolution) appears multiple times for the same labour group. [Batch-level error]
-- **Partial allocation fields**: Some but not all of Location, Department, Role, or Allocation Value are provided. [Row-level error]
-- **Invalid Allocation Value**: Value is not a number between 0 and 100, or has more than 2 decimal places. [Row-level error]
-- **Location/Department/Role not found**: Entity identifier doesn't match any record in WFM. [Row-level error]
-- **Invalid Location/Department/Role combination**: The combination doesn't exist as a valid DepartmentRole relationship in WFM. [Row-level error]
-- **Export Code not unique**: Two or more labour groups have the same Export Code value (validated during import). [Batch-level error]
-- **New labour group without shift types**: Creating a new labour group requires at least one shift type unless the group is being deleted. [Row-level error]
+File must be under 15 MB. The system automatically handles batching during import (maximum 200 records per batch, grouped by labour group identifier).
 
 ## Tips
 
-- Always test with a small sample file in a non-production environment before bulk importing.
 - Use Export Code or GuidKey for more reliable matching in scheduled imports.
-- Shift types must already exist in the system. Leave types are automatically excluded.
-- To update only shift types for an existing labour group, provide rows with the labour group identifier and Shift Type field populated, leaving all allocation fields blank.
-- To update only allocations for an existing labour group, provide rows with the labour group identifier and all allocation fields populated. Leave Shift Type blank to preserve existing shift types.
-- To delete a labour group, provide a row with the labour group identifier and set Labour Group Deleted = Y.
-- To delete a specific allocation, provide a row with the labour group identifier, all allocation fields, and set Allocation Deleted = Y.
 - All rows for the same labour group must use the same labour group identifier value and the same Shift Type value (or all leave it blank).
-- **Critical**: Ensure no duplicate Location+Department+Role combinations exist within each labour group, as this will reject the entire batch.
+- Ensure no duplicate Location+Department+Role combinations exist within each labour group.
 - To avoid duplication, do not upload the same file more than once.
